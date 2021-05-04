@@ -90,8 +90,9 @@ def strip_form_data(self, form):
         The :class:`~ufl.Form` object to be stripped. Note that it will be
         modified after calling this function.
     :returns:
-        A mapping (:class:`dict`) from :class:`DataCarrierMixin` objects ->
-        data structures.
+        A mapping (:class:`dict`) from :class:`DataCarrierMixin` objects to
+        data structures. The key of the dictionary is a 2-tuple of the
+        :class:`DataCarrierMixin` object and the attribute name (:class:`str`).
     """
     datamap = {}
     for coeff in form.coefficients():
@@ -105,8 +106,9 @@ def attach_form_data(self, form, datamap):
     :arg form:
         The :class:`~ufl.Form` to have data attached to.
     :arg datamap:
-        A mapping (:class:`dict`) from :class:`DataCarrierMixin` objects ->
-        data structures.
+        A mapping (:class:`dict`) from :class:`DataCarrierMixin` objects to
+        data structures. The key of the dictionary is a 2-tuple of the
+        :class:`DataCarrierMixin` object and the attribute name (:class:`str`).
     """
     for coeff in form.coefficients():
         coeff.attach_data(datamap)

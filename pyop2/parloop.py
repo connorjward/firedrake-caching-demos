@@ -49,21 +49,21 @@ class Parloop:
 
 # Example usage when caching the parloop
 if __name__ == "__main__":
-    # Retrieve the cached argmap and parloop. Here argmap is a mapping (dict)
+    # Retrieve the cached mapping and parloop. Here arg2coeff is a mapping (dict)
     # between each op2.Arg and the UFL coefficient that it corresponds to.
-    # To avoid refcycles the coefficients are referenced weakly (argmap is a
+    # To avoid refcycles the coefficients are referenced weakly (arg2coeff is a
     # WeakValueDictionary).
     # This does not include the output tensor (since this can change) so that
     # op2.Arg is returned separately.
-    argmap, tensor_arg = form._cache.setdefault("argmap", make_argmap(form))
+    arg2coeff, tensor_arg = form._cache.setdefault("argmap", make_argmap(form))
     parloop = form._cache.setdefault("parloop", make_parloop(argmap))
 
     # Create a mapping from op2.Arg -> op2.Dat. This needs to be a separate,
     # non-cached step in case the data structures of the form are modified
     # (i.e. it is stripped and then new data is attached).
-    datamap = {arg: coeff.dat for arg, coeff in argmap}
+    arg2data = {arg: coeff.dat for arg, coeff in arg2coeff}
 
     # Add the output tensor
-    datamap[tensor_arg] = tensor.dat
+    arg2data[tensor_arg] = tensor.dat
 
-    parloop.execute(datamap)
+    parloop.execute(arg2data)

@@ -4,6 +4,10 @@ import numpy as np
 class DataCarrierMixin:
 
     _data_attrs = ()
+    """Iterable of attributes that hold references to data. These will be
+    extracted when :func:`strip_data` is called. Any :class:`DataCarrierMixin`
+    objects listed here will be recursively stripped.
+    """
 
     def __init__(self):
         self._is_stripped = False
@@ -70,6 +74,7 @@ class FunctionSpace(DataCarrierMixin):
         super().__init__()
         self.dat = np.empty(100)
 
+
 class Vector(DataCarrierMixin):
     _data_attrs = ("dat",)
 
@@ -78,19 +83,33 @@ class Vector(DataCarrierMixin):
         self.dat = np.empty(100)
 
 
-class Form:
+def strip_form_data(self, form):
+    """Strip the data from a form.
 
-    ...
+    :arg form:
+        The :class:`~ufl.Form` object to be stripped. Note that it will be
+        modified after calling this function.
+    :returns:
+        A mapping (:class:`dict`) from :class:`DataCarrierMixin` objects ->
+        data structures.
+    """
+    datamap = {}
+    for coeff in form.coefficients():
+        datamap |= coeff.strip_data()
+    return datamap
 
-    def strip_data(self):
-        datamap = {}
-        for coeff in self.coefficients:
-            datamap |= coeff.strip_data()
-        return datamap
 
-    def attach_data(self, datamap):
-        for coeff in self.coefficients:
-            coeff.attach_data(datamap)
+def attach_form_data(self, form, datamap):
+    """Attach data back to a form.
+
+    :arg form:
+        The :class:`~ufl.Form` to have data attached to.
+    :arg datamap:
+        A mapping (:class:`dict`) from :class:`DataCarrierMixin` objects ->
+        data structures.
+    """
+    for coeff in form.coefficients():
+        coeff.attach_data(datamap)
 
 
 if __name__ == "__main__":
